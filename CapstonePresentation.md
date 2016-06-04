@@ -1,0 +1,73 @@
+n-Gram Text Prediction
+========================================================
+author: Saifuddin Mohd
+date: 05/06/2016
+
+Overview
+========================================================
+
+https://oodeng.shinyapps.io/capstone-coursera/
+is an R Shiny application exploring the topic of
+text prediction, in part fulfillment of the Coursera Johns Hopkins University 
+Data Science Specialization Capstone Project.
+
+The application was designed with the following goals in mind:
+
+- Satisfy requirement of predicting the next work given an input n-gram
+- Ease of use
+- Exploring different prediction algorithms
+
+User Interface
+========================================================
+
+The main layout elements are a sidebar panel with prediction
+algorithm controls (which mutate based on selections to
+keep only relevant controls visible) and a main content panel
+with tabs for 
+
+- 'Prediction' (with input and output elements)
+- 'Instructions' documenting the UI and prediction algos; 
+see this tab for more information than would fit in this presentation.
+- 'Bibliography' recording various sources I found useful
+- 'About' containing authoring and versioning details.
+
+Naive Corpus n-Gram Algorithm
+========================================================
+
+The training data from 
+https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip
+was cleaned (canonical case, removed numbers and punctuation) and {2,3,4}-grams
+formed for use in prediction. The best match (ordering by n-Gram length and then
+prevalence) is used to predict the next word following the input n-Gram.
+
+
+This could be refined using http://en.wikipedia.org/wiki/Katz%27s_back-off_model
+instead of pure n-Gram length.
+
+
+Word Association Supplement
+========================================================
+
+Rather than simply using the most prevalent n-Gram, we can try to infer a more
+likely completion from among those extant in the training Corpus by exploring which
+possible completions also have associations with words occurring earlier in the 
+input text.
+
+I used a simple weighted linear sum to assign a score to each completion, with factors for the n-Gram appearance count in the original corpus, the n-Gram length and the conditional probability of the predicted word given the earlier word. A better approach would be to use a more formal Bayesian prediction rather than weighted score.
+
+This requires much more storage and while I implemented it in Python for the quizes,
+I did not successfully translate it to my R Shiny app.
+
+
+Sentence Structure Analysis
+========================================================
+
+In looking only at n-Grams and associations, we lose all information about
+the structure of the English language, excepting a very limited local view
+provided by the n-Gram. Consider the following:
+
+"If, in the unlikely event we did so decide, we"
+
+An n-Gram approach is blind to the possibility of things like clause elimination;
+we could totally ignore the middle clause and look at "If we", which might yield
+a much higher probability of predicting the word was, say, "can" instead of "are" (the most common word to follow we). By using the known structure of the English language we can infer closer links between disparate terms in the input and thus make our conditional inferences much more accurate. Again, I did not have time to implement this in R.
